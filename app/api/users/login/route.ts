@@ -12,17 +12,19 @@ export const POST = async (req: NextRequest) => {
     const { username, password } = body;
 
     if (!username || !password) {
-      return new Response("Username and Password is required", { status: 401 });
+      return NextResponse.json("Username and Password is required", {
+        status: 401,
+      });
     }
 
     const user = await User.findOne({ username });
     if (!user) {
-      return new Response("Username does not exist", { status: 400 });
+      return NextResponse.json("User does not exist", { status: 400 });
     }
 
     const validPassword = await bcryptjs.compare(password, user.password);
     if (!validPassword) {
-      return new Response("Incorrect Password", { status: 400 });
+      return NextResponse.json("Wrong username or password", { status: 400 });
     }
 
     const jwtSecret = process.env.JWT_SECRETKEY;
@@ -40,6 +42,6 @@ export const POST = async (req: NextRequest) => {
     return response;
   } catch (error: any) {
     console.log("Error", error.message);
-    return new Response("Something went wrong ", { status: 500 });
+    return NextResponse.json("Something went wrong ", { status: 500 });
   }
 };

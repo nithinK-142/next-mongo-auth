@@ -1,7 +1,7 @@
 import { Connect } from "@/database/config";
 import User from "@/models/user";
 import bcryptjs from "bcryptjs";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 Connect();
 
@@ -12,14 +12,14 @@ export const POST = async (req: NextRequest) => {
     const { email, username, password } = body;
 
     if (!email || !username || !password) {
-      return new Response("Email, Username and Password is required", {
+      return NextResponse.json("Email, Username and Password is required", {
         status: 401,
       });
     }
 
     const user = await User.findOne({ username });
     if (user) {
-      return new Response("Username already exist", { status: 400 });
+      return NextResponse.json("Username already exists", { status: 400 });
     }
 
     const salt = await bcryptjs.genSalt(12);
@@ -33,7 +33,7 @@ export const POST = async (req: NextRequest) => {
 
     await newUser.save();
 
-    return new Response("User saved successfully", { status: 200 });
+    return NextResponse.json("User saved successfully", { status: 200 });
   } catch (error) {
     console.log(error);
   }
