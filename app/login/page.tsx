@@ -25,7 +25,7 @@ const LoginPage = () => {
     }
 
     try {
-      const responsePromise = axios.post("/api/user/login", data).then(
+      const responsePromise = axios.post("/api/users/login", data).then(
         (response) => {
           if (response.data.error) throw new Error(response.data.error);
 

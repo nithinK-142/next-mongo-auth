@@ -8,7 +8,7 @@ const Logout = () => {
 
   const handleLogout = async () => {
     try {
-      const logoutPromise = axios.get("/api/user/logout").then(
+      const logoutPromise = axios.get("/api/users/logout").then(
         (response) => {
           if (response.data.error) {
             throw new Error(response.data.error);

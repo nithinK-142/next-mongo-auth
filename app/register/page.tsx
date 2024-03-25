@@ -25,7 +25,7 @@ const RegisterPage = () => {
     }
 
     try {
-      const responsePromise = axios.post("/api/user/register", data).then(
+      const responsePromise = axios.post("/api/users/register", data).then(
         (response) => {
           if (response.data.error) throw new Error(response.data.error);
 
