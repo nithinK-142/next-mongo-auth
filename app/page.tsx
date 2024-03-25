@@ -1,10 +1,10 @@
-import Logout from "@/components/Logout";
+import Profile from "@/components/Profile";
 
-export default async function Home() {
+export default function Home() {
   return (
     <main className="flex flex-col items-center text-center">
-      <h1 className="text-center text-2xl p-24">NextJs Mongo Auth</h1>
-      <Logout />
+      <h1 className="text-center text-2xl p-24">NextJs Guide</h1>
+      <Profile />
     </main>
   );
 }

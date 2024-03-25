@@ -29,6 +29,7 @@ const LoginPage = () => {
         (response) => {
           if (response.data.error) throw new Error(response.data.error);
 
+          localStorage.setItem("username", response.data.username);
           setData(defaultData);
           return response;
         },

@@ -1,4 +1,3 @@
-"use client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -13,6 +12,7 @@ const Logout = () => {
           if (response.data.error) {
             throw new Error(response.data.error);
           }
+          localStorage.clear();
           return response;
         },
         (error) => {
@@ -34,15 +34,12 @@ const Logout = () => {
     }
   };
   return (
-    <section>
-      <h2 className="text-lg">Welcome</h2>
-      <button
-        className="bg-red-500 hover:bg-red-700 text-white font-normal py-2 px-3 rounded-lg mt-10 w-full"
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
-    </section>
+    <button
+      className="px-4 py-1 rounded-lg text-white bg-black/80 dark:bg-white/80 dark:text-black/70"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
   );
 };
 
