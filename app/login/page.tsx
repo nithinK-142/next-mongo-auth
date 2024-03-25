@@ -3,6 +3,7 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const defaultData = { username: "", password: "" };
 
@@ -24,12 +25,31 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await axios.post("/api/user/login", data);
-      setData(defaultData);
+      const responsePromise = axios.post("/api/user/login", data).then(
+        (response) => {
+          if (response.data.error) throw new Error(response.data.error);
 
-      if (response.status === 200) {
-        router.push("/");
-      }
+          setData(defaultData);
+          return response;
+        },
+        (error) => {
+          console.log(error);
+          throw error;
+        }
+      );
+
+      toast.promise(
+        responsePromise,
+        {
+          loading: "processing...",
+          success: () => {
+            router.push("/");
+            return "Logged in successfully";
+          },
+          error: (err) => `Login failed: ${err.response.data}`,
+        },
+        { success: { icon: "🚀" } }
+      );
     } catch (error) {
       console.log(error);
     }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const defaultData = { email: "", username: "", password: "" };
 
@@ -24,12 +25,27 @@ const RegisterPage = () => {
     }
 
     try {
-      const response = await axios.post("/api/user/register", data);
-      setData(defaultData);
+      const responsePromise = axios.post("/api/user/register", data).then(
+        (response) => {
+          if (response.data.error) throw new Error(response.data.error);
 
-      if (response.status === 200) {
-        router.push("/login");
-      }
+          setData(defaultData);
+          return response;
+        },
+        (error) => {
+          console.log(error);
+          throw error;
+        }
+      );
+
+      toast.promise(responsePromise, {
+        loading: "processing...",
+        success: () => {
+          router.push("/login");
+          return "User registered.";
+        },
+        error: (err) => `Registration failed: ${err.response.data}`,
+      });
     } catch (error) {
       console.log(error);
     }

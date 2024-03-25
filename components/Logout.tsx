@@ -1,13 +1,37 @@
 "use client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Logout = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const response = await axios.get("/api/user/logout");
-    if (response.status === 200) router.push("/login");
+    try {
+      const logoutPromise = axios.get("/api/user/logout").then(
+        (response) => {
+          if (response.data.error) {
+            throw new Error(response.data.error);
+          }
+          return response;
+        },
+        (error) => {
+          console.log(error);
+          throw error;
+        }
+      );
+
+      toast.promise(logoutPromise, {
+        loading: "Logging out...",
+        success: () => {
+          router.push("/login");
+          return "Logout successful";
+        },
+        error: (err) => `Logout failed: ${err.message}`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <section>
