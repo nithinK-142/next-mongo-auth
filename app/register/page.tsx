@@ -2,7 +2,7 @@
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 
 const defaultData = { email: "", username: "", password: "" };
@@ -12,11 +12,11 @@ const RegisterPage = () => {
 
   const router = useRouter();
 
-  const onValueChange = (e: { target: { name: string; value: string } }) => {
+  const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!data.username || !data.password || !data.email) {
