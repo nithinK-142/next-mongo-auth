@@ -27,7 +27,7 @@ const Logout = () => {
           router.push("/login");
           return "Logout successful";
         },
-        error: (err) => `Logout failed: ${err.message}`,
+        error: (err: any) => `Logout failed: ${err}`,
       });
     } catch (error) {
       console.log(error);

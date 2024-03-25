@@ -22,8 +22,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json("Username already exists", { status: 400 });
     }
 
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       email,
