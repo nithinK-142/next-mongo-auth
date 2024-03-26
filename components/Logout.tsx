@@ -7,30 +7,19 @@ const Logout = () => {
 
   const handleLogout = async () => {
     try {
-      const logoutPromise = axios.get("/api/users/logout").then(
-        (response) => {
-          if (response.data.error) {
-            throw new Error(response.data.error);
-          }
-          localStorage.clear();
-          return response;
-        },
-        (error) => {
-          console.log(error);
-          throw error;
-        }
-      );
+      const responsePromise = axios.get("/api/users/logout");
 
-      toast.promise(logoutPromise, {
+      toast.promise(responsePromise, {
         loading: "Logging out...",
-        success: () => {
+        success: (response) => {
+          localStorage.clear();
           router.push("/login");
-          return "Logout successful";
+          return response.data.message;
         },
-        error: (err: any) => `Logout failed: ${err}`,
+        error: (error) => `Logout failed: ${error.response.data.error}`,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     }
   };
   return (

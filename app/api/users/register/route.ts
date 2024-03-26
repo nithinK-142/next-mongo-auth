@@ -12,14 +12,18 @@ export const POST = async (req: NextRequest) => {
     const { email, username, password } = body;
 
     if (!email || !username || !password) {
-      return NextResponse.json("Email, Username and Password is required", {
-        status: 401,
-      });
+      return NextResponse.json(
+        { message: "Email, Username and Password is required" },
+        { status: 401 }
+      );
     }
 
     const user = await User.findOne({ username });
     if (user) {
-      return NextResponse.json("Username already exists", { status: 400 });
+      return NextResponse.json(
+        { message: "Username already exists" },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,8 +36,15 @@ export const POST = async (req: NextRequest) => {
 
     await newUser.save();
 
-    return NextResponse.json("User saved successfully", { status: 200 });
-  } catch (error) {
-    console.log(error);
+    return NextResponse.json(
+      { message: "User registered successfully, now login!" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 };

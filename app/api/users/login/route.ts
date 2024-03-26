@@ -3,6 +3,7 @@ import User from "@/models/user";
 import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 Connect();
 
@@ -12,19 +13,26 @@ export const POST = async (req: NextRequest) => {
     const { username, password } = body;
 
     if (!username || !password) {
-      return NextResponse.json("Username and Password is required", {
-        status: 401,
-      });
+      return NextResponse.json(
+        { message: "Username and Password is required" },
+        { status: 401 }
+      );
     }
 
     const user = await User.findOne({ username });
     if (!user) {
-      return NextResponse.json("User does not exist", { status: 400 });
+      return NextResponse.json(
+        { message: "User does not exist" },
+        { status: 400 }
+      );
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return NextResponse.json("Wrong username or password", { status: 400 });
+      return NextResponse.json(
+        { message: "Wrong username or password" },
+        { status: 400 }
+      );
     }
 
     const jwtSecret = process.env.JWT_SECRETKEY;
@@ -36,15 +44,17 @@ export const POST = async (req: NextRequest) => {
       { expiresIn: "1d" }
     );
 
-    const response = NextResponse.json({
+    cookies().set({ name: "token", value: token, httpOnly: true });
+
+    return NextResponse.json({
       message: "Login successfull",
       username: user.username,
     });
-
-    response.cookies.set("token", token, { httpOnly: true });
-    return response;
   } catch (error: any) {
-    console.log("Error", error.message);
-    return NextResponse.json("Something went wrong ", { status: 500 });
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 };

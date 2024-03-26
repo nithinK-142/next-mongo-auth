@@ -20,34 +20,25 @@ const RegisterPage = () => {
     e.preventDefault();
 
     if (!data.username || !data.password || !data.email) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
-      const responsePromise = axios.post("/api/users/register", data).then(
-        (response) => {
-          if (response.data.error) throw new Error(response.data.error);
-
-          setData(defaultData);
-          return response;
-        },
-        (error) => {
-          console.log(error);
-          throw error;
-        }
-      );
+      const responsePromise = axios.post("/api/users/register", data);
 
       toast.promise(responsePromise, {
         loading: "processing...",
-        success: () => {
+        success: (response) => {
+          setData(defaultData);
           router.push("/login");
-          return "User registered.";
+          return response.data.message;
         },
-        error: (err) => `Registration failed: ${err.response.data}`,
+        error: (error) =>
+          `User Registration failed: ${error.response.data.error}`,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     }
   };
 

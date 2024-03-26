@@ -20,39 +20,29 @@ const LoginPage = () => {
     e.preventDefault();
 
     if (!data.username || !data.password) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
-      const responsePromise = axios.post("/api/users/login", data).then(
-        (response) => {
-          if (response.data.error) throw new Error(response.data.error);
-
-          localStorage.setItem("username", response.data.username);
-          setData(defaultData);
-          return response;
-        },
-        (error) => {
-          console.log(error);
-          throw error;
-        }
-      );
+      const responsePromise = axios.post("/api/users/login", data);
 
       toast.promise(
         responsePromise,
         {
           loading: "processing...",
-          success: () => {
+          success: (response) => {
+            localStorage.setItem("username", response.data.username);
             router.push("/");
-            return "Logged in successfully";
+            setData(defaultData);
+            return response.data.message;
           },
-          error: (err) => `Login failed: ${err.response.data}`,
+          error: (error) => `Login failed: ${error.response.data.error}`,
         },
         { success: { icon: "🚀" } }
       );
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     }
   };
   return (

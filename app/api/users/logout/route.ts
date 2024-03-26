@@ -1,16 +1,26 @@
 import { Disconnect } from "@/database/config";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = NextResponse.json({
-      message: "Logout Successful",
-      success: true,
+    cookies().set({
+      name: "token",
+      value: "",
+      httpOnly: true,
+      expires: new Date(0),
     });
-    response.cookies.set("token", "", { httpOnly: true, expires: new Date(0) });
-    return response;
+
+    return NextResponse.json(
+      { message: "Logout Successfull" },
+      { status: 200 }
+    );
   } catch (error: any) {
-    return NextResponse.json({ error: error.message, status: 500 });
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   } finally {
     setTimeout(async () => {
       await Disconnect();
