@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       name: "encryptedTokenId",
       value: encryptedTokenId,
       httpOnly: true,
+      secure: true,
     });
 
     // const mailOptions = {
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
     // await transporter.sendMail(mailOptions);
 
     return NextResponse.json(
-      { message: "Verification email sent, check your inbox" },
+      { message: "Check your inbox for verification email" },
       { status: 200 }
     );
   } catch (error: any) {

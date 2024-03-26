@@ -44,7 +44,12 @@ export const POST = async (req: NextRequest) => {
       { expiresIn: "1d" }
     );
 
-    cookies().set({ name: "token", value: token, httpOnly: true });
+    cookies().set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: true,
+    });
 
     return NextResponse.json(
       { message: "Login successfull", username: user.username },
