@@ -1,23 +1,26 @@
 "use client";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Suspense } from "react";
 
-const VerifyToken = () => {
+const VerifyTokenClient = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const token = searchParams.get("verifyToken");
   const tokenId = searchParams.get("verifyTokenId");
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("tokenId", tokenId as string);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const router = useRouter();
+  }, [tokenId]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!token) router.push("/login");
     try {
       const responsePromise = axios
         .post("/api/users/reset-password/verify-token", { token })
@@ -70,6 +73,14 @@ const VerifyToken = () => {
         )}
       </div>
     </section>
+  );
+};
+
+const VerifyToken = () => {
+  return (
+    <Suspense>
+      <VerifyTokenClient />
+    </Suspense>
   );
 };
 
