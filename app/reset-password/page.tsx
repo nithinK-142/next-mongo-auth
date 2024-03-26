@@ -18,41 +18,30 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!data.newPassword || !data.confirmPassword) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
-    if (!data.newPassword !== !data.confirmPassword) {
-      alert("Passwords dont match");
+    if (data.newPassword !== data.confirmPassword) {
+      toast.error("Passwords dont match");
       return;
     }
 
     try {
-      const responsePromise = axios
-        .post("/api/users/reset-password", {
-          password: data.confirmPassword,
-        })
-        .then(
-          (response) => {
-            if (response.data.error) throw new Error(response.data.error);
-            return response;
-          },
-          (error) => {
-            console.log(error);
-            throw error;
-          }
-        );
+      const responsePromise = axios.post("/api/users/reset-password", {
+        password: data.confirmPassword,
+      });
 
       toast.promise(responsePromise, {
         loading: "processing...",
-        success: () => {
+        success: (response) => {
           router.push("/login");
-          return "Password has been reset, now login!";
+          return response.data.message;
         },
-        error: (err: any) => `Password reset failed: ${err}`,
+        error: (error) => `Password reset failed: ${error.response.data.error}`,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     } finally {
       setData(defaultData);
     }

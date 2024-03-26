@@ -15,29 +15,22 @@ const VerifyTokenClient = () => {
     e.preventDefault();
     if (!token) router.push("/login");
     try {
-      const responsePromise = axios
-        .post("/api/users/reset-password/verify-token", { token })
-        .then(
-          (response) => {
-            if (response.data.error) throw new Error(response.data.error);
-            return response;
-          },
-          (error) => {
-            console.log(error);
-            throw error;
-          }
-        );
+      const responsePromise = axios.post(
+        "/api/users/reset-password/verify-token",
+        { token }
+      );
 
       toast.promise(responsePromise, {
         loading: "processing...",
-        success: () => {
+        success: (response) => {
           router.push("/reset-password");
-          return "Token verified successfuly!";
+          return response.data.message;
         },
-        error: (err: any) => `Token verification failed: ${err}`,
+        error: (error) =>
+          `User verification failed: ${error.response.data.error}`,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     }
   };
 

@@ -13,36 +13,26 @@ const GenerateToken = () => {
     e.preventDefault();
 
     if (!data.email) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
-      const responsePromise = axios
-        .post("/api/users/reset-password/generate-token", {
-          email: data.email,
-        })
-        .then(
-          (response) => {
-            if (response.data.error) throw new Error(response.data.error);
-            setData(defaultData);
-            return response;
-          },
-          (error) => {
-            console.log(error);
-            throw error;
-          }
-        );
+      const responsePromise = axios.post(
+        "/api/users/reset-password/generate-token",
+        { email: data.email }
+      );
 
       toast.promise(responsePromise, {
         loading: "processing...",
-        success: () => {
-          return "Token generated, check your mail inbox!";
+        success: (response) => {
+          setData(defaultData);
+          return response.data.message;
         },
-        error: (err) => `Token generation failed: ${err.response.data}`,
+        error: (error) => error.response.data.error,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response);
     }
   };
 

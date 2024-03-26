@@ -14,7 +14,10 @@ export async function POST(request: Request) {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User not found or Invalid email" },
+        { status: 404 }
+      );
     }
 
     // Generate a reset token
@@ -50,9 +53,15 @@ export async function POST(request: Request) {
 
     // await transporter.sendMail(mailOptions);
 
-    return NextResponse.json({ message: "Verification email sent" });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Internal server error", status: 500 });
+    return NextResponse.json(
+      { message: "Verification email sent, check your inbox" },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
