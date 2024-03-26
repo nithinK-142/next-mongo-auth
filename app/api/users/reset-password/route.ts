@@ -4,21 +4,27 @@ import { Connect } from "@/database/config";
 import User from "@/models/user";
 import ResetToken from "@/models/token";
 import { decryptId } from "@/utils/crypto";
+import { cookies } from "next/headers";
 
 Connect();
 export async function POST(req: NextRequest) {
   try {
-    const { tokenId, password } = await req.json();
+    const { password } = await req.json();
 
-    if (!tokenId || !password) {
+    const encryptedTokenId = cookies().get("encryptedTokenId");
+
+    if (encryptedTokenId === undefined) {
       return NextResponse.json({
         error: "Invalid or expired token",
         status: 400,
       });
     }
 
-    const decryptedTokenId = tokenId;
-    // const decryptedTokenId = decryptId(tokenId);
+    const decryptedTokenId = decryptId(encryptedTokenId.value);
+
+    if (!password) {
+      return NextResponse.json({ error: "Invalid password", status: 400 });
+    }
 
     const resetToken = await ResetToken.findOne({ _id: decryptedTokenId });
     if (!resetToken) {
@@ -50,6 +56,8 @@ export async function POST(req: NextRequest) {
     );
 
     await ResetToken.deleteOne({ _id: decryptedTokenId });
+
+    cookies().delete("encryptedTokenId");
 
     return NextResponse.json({
       message: "Password reset successful",

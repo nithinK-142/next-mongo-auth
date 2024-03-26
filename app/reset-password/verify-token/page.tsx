@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent } from "react";
 import toast from "react-hot-toast";
 import { Suspense } from "react";
 
@@ -10,13 +10,6 @@ const VerifyTokenClient = () => {
   const router = useRouter();
 
   const token = searchParams.get("verifyToken");
-  const tokenId = searchParams.get("verifyTokenId");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("tokenId", tokenId as string);
-    }
-  }, [tokenId]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

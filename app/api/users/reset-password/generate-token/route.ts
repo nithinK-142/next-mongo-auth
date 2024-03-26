@@ -5,6 +5,7 @@ import User from "@/models/user";
 import ResetToken from "@/models/token";
 import { Connect } from "@/database/config";
 import { encryptId } from "@/utils/crypto";
+import { cookies } from "next/headers";
 
 Connect();
 export async function POST(request: Request) {
@@ -28,11 +29,17 @@ export async function POST(request: Request) {
     //   // Configure your email transport options (e.g., SMTP)
     // });
 
-    const encryptedTokenId = resetToken._id.toString();
-    // const encryptedTokenId = encryptId(resetToken._id.toString());
-    const verificationLink = `${process.env.NEXTAUTH_MONGO_URL}/reset-password/verify-token?verifyToken=${token}&verifyTokenId=${encryptedTokenId}`;
+    const tokenId = resetToken._id.toString();
+    const encryptedTokenId = encryptId(tokenId);
+    const verificationLink = `${process.env.NEXTAUTH_MONGO_URL}/reset-password/verify-token?verifyToken=${token}&verifyTokenId=${tokenId}`;
 
     console.log(verificationLink);
+
+    cookies().set({
+      name: "encryptedTokenId",
+      value: encryptedTokenId,
+      httpOnly: true,
+    });
 
     // const mailOptions = {
     //   from: "your-email@example.com",

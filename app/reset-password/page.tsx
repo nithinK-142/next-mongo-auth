@@ -1,20 +1,13 @@
 "use client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import toast from "react-hot-toast";
 
 const defaultData = { newPassword: "", confirmPassword: "" };
 
 const ResetPassword = () => {
   const [data, setData] = useState(defaultData);
-  const [tokenId, setTokenId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setTokenId(localStorage.getItem("tokenId"));
-    }
-  }, []);
   const router = useRouter();
 
   const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +31,6 @@ const ResetPassword = () => {
       const responsePromise = axios
         .post("/api/users/reset-password", {
           password: data.confirmPassword,
-          tokenId,
         })
         .then(
           (response) => {
