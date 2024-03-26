@@ -14,7 +14,7 @@ export const POST = async (req: NextRequest) => {
 
     if (!username || !password) {
       return NextResponse.json(
-        { message: "Username and Password is required" },
+        { error: "Username and Password is required" },
         { status: 401 }
       );
     }
@@ -22,7 +22,7 @@ export const POST = async (req: NextRequest) => {
     const user = await User.findOne({ username });
     if (!user) {
       return NextResponse.json(
-        { message: "User does not exist" },
+        { error: "User does not exist" },
         { status: 400 }
       );
     }
@@ -30,7 +30,7 @@ export const POST = async (req: NextRequest) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return NextResponse.json(
-        { message: "Wrong username or password" },
+        { error: "Wrong username or password" },
         { status: 400 }
       );
     }
@@ -46,10 +46,10 @@ export const POST = async (req: NextRequest) => {
 
     cookies().set({ name: "token", value: token, httpOnly: true });
 
-    return NextResponse.json({
-      message: "Login successfull",
-      username: user.username,
-    });
+    return NextResponse.json(
+      { message: "Login successfull", username: user.username },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error(error.message);
     return NextResponse.json(

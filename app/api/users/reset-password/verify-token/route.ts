@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 
     if (!token) {
       return NextResponse.json(
-        { message: "Enter your email again!" },
+        { error: "Enter your email again!" },
         { status: 401 }
       );
     }

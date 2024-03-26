@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 
     if (!email || !username || !password) {
       return NextResponse.json(
-        { message: "Email, Username and Password is required" },
+        { error: "Email, Username and Password is required" },
         { status: 401 }
       );
     }
@@ -21,7 +21,7 @@ export const POST = async (req: NextRequest) => {
     const user = await User.findOne({ username });
     if (user) {
       return NextResponse.json(
-        { message: "Username already exists" },
+        { error: "Username already exists" },
         { status: 400 }
       );
     }
