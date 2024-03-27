@@ -18,6 +18,14 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
+    const isEmail = await User.findOne({ email });
+    if (isEmail) {
+      return NextResponse.json(
+        { error: "Email already in use" },
+        { status: 400 }
+      );
+    }
+
     const user = await User.findOne({ username });
     if (user) {
       return NextResponse.json(
