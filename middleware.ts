@@ -2,37 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isPublicPath = path === "/login" || path === "/register";
   const token = request.cookies.get("token")?.value || "";
+  const encryptedTokenId = request.cookies.get("encryptedTokenId")?.value || "";
   const verifyToken = request.nextUrl.searchParams.get("verifyToken") || "";
 
-  // Allow access ONLY for unauthenticated users (no token)
-  // if (path === "/reset-password/generate-token" && !token) {
-  //   return NextResponse.next();
-  // }
+  // If user has token (authenticated), allow request to proceed
+  if (path === "/" && token) {
+    return NextResponse.next();
+  }
 
-  // // Allow access ONLY for unauthenticated users (no token) and if they have a verifyToken
-  // if (path === "/reset-password/verify-token" && !token && verifyToken) {
-  //   return NextResponse.next();
-  // }
+  // If user has no token (unauthenticated), allow request to proceed
+  if (path === "/" && !token) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
 
-  // // Deny access for all users
-  // if (path === "/reset-password") {
-  //   return NextResponse.redirect(new URL("/", request.nextUrl));
-  // }
+  // If user has token (authenticated) and path is /login or /register, redirect to /
+  if ((token && path === "/login") || (token && path === "/register")) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
+  }
 
-  // // If isPublicPath and user is authenticated (has a token), redirect to root (/)
-  // if (isPublicPath && token) {
-  //   return NextResponse.redirect(new URL("/", request.nextUrl));
-  // }
+  // If user doesn't have encryptedTokenId and path is /reset-password, redirect to /login
+  if (path === "/reset-password" && !encryptedTokenId) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
 
-  // // If isPublicPath and user is unauthenticated (no token), redirect to login (/login)
-  // if (!isPublicPath && !token &&
-  //   path !== "/reset-password/generate-token" &&
-  //   path !== "/reset-password/verify-token"
-  // ) {
-  //   return NextResponse.redirect(new URL("/login", request.nextUrl));
-  // }
+  // If user doesn't have encryptedTokenId or verifyToken and path is /reset-password/verify-token, redirect /login
+  if (
+    path === "/reset-password/verify-token" &&
+    (!encryptedTokenId || !verifyToken)
+  ) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
 
   // If none of the above, allow request to proceed
   return NextResponse.next();
