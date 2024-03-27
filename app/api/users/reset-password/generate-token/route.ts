@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
+import { SentMessageInfo } from "nodemailer";
 import User from "@/models/user";
 import ResetToken from "@/models/token";
 import { Connect } from "@/database/config";
 import { encryptId } from "@/utils/crypto";
-import { cookies } from "next/headers";
+import { sendMail } from "@/utils/mailer";
 
 Connect();
 export async function POST(request: Request) {
@@ -27,25 +27,21 @@ export async function POST(request: Request) {
     const resetToken = new ResetToken({ user: user._id, token });
     await resetToken.save();
 
-    // Send the verification email
-    // const transporter = nodemailer.createTransport({
-    //   // Configure your email transport options (e.g., SMTP)
-    // });
-
     const tokenId = resetToken._id.toString();
     const encryptedTokenId = encryptId(tokenId);
     const verificationLink = `${process.env.NEXTAUTH_MONGO_URL}/reset-password/verify-token?verifyToken=${token}&verifyTokenId=${tokenId}`;
 
     console.log(verificationLink);
 
-    // const mailOptions = {
-    //   from: "your-email@example.com",
-    //   to: email,
-    //   subject: "Reset Password",
-    //   html: `Click <a href="${verificationLink}">here</a> to reset your password.`,
-    // };
+    const mailResponse = await sendMail(email, verificationLink);
 
-    // await transporter.sendMail(mailOptions);
+    const { accepted } = mailResponse as SentMessageInfo;
+    if (accepted.length === 0) {
+      return NextResponse.json(
+        { error: "Failed to send verification email" },
+        { status: 500 }
+      );
+    }
 
     const response = NextResponse.json(
       { message: "Check your inbox for verification email" },
