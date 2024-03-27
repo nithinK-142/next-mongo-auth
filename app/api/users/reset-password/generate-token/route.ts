@@ -38,13 +38,6 @@ export async function POST(request: Request) {
 
     console.log(verificationLink);
 
-    cookies().set({
-      name: "encryptedTokenId",
-      value: encryptedTokenId,
-      httpOnly: true,
-      secure: true,
-    });
-
     // const mailOptions = {
     //   from: "your-email@example.com",
     //   to: email,
@@ -54,10 +47,19 @@ export async function POST(request: Request) {
 
     // await transporter.sendMail(mailOptions);
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Check your inbox for verification email" },
       { status: 200 }
     );
+
+    response.cookies.set({
+      name: "encryptedTokenId",
+      value: encryptedTokenId,
+      httpOnly: true,
+      secure: true,
+    });
+
+    return response;
   } catch (error: any) {
     console.error(error.message);
     return NextResponse.json(

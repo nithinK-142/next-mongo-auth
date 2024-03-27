@@ -39,22 +39,24 @@ export const POST = async (req: NextRequest) => {
     if (!jwtSecret) throw new Error("JWT_SECRETKEY is not defined");
 
     const token = jwt.sign(
-      { username: user.username, id: user._id },
+      { id: user._id, username: user.username },
       jwtSecret,
       { expiresIn: "1d" }
     );
 
-    cookies().set({
+    const response = NextResponse.json(
+      { message: "Login successfull", username: user.username },
+      { status: 200 }
+    );
+
+    response.cookies.set({
       name: "token",
       value: token,
       httpOnly: true,
       secure: true,
     });
 
-    return NextResponse.json(
-      { message: "Login successfull", username: user.username },
-      { status: 200 }
-    );
+    return response;
   } catch (error: any) {
     console.error(error.message);
     return NextResponse.json(

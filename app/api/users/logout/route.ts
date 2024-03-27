@@ -4,17 +4,19 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    cookies().set({
+    const response = NextResponse.json(
+      { message: "Logout Successfull" },
+      { status: 200 }
+    );
+
+    response.cookies.set({
       name: "token",
       value: "",
       httpOnly: true,
       expires: new Date(0),
     });
 
-    return NextResponse.json(
-      { message: "Logout Successfull" },
-      { status: 200 }
-    );
+    return response;
   } catch (error: any) {
     console.error(error.message);
     return NextResponse.json(
