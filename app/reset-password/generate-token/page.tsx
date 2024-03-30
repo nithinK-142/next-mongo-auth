@@ -1,32 +1,39 @@
 "use client";
+import {
+  ResetPasswordEmailType,
+  resetPasswordEmailSchema,
+} from "@/utils/schemas/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import Link from "next/link";
-import { useState, FormEvent } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 
 const defaultData = { email: "" };
 
 const GenerateToken = () => {
-  const [data, setData] = useState(defaultData);
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<ResetPasswordEmailType>({
+    resolver: zodResolver(resetPasswordEmailSchema),
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!data.email) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
+  const handleFormSubmit: SubmitHandler<ResetPasswordEmailType> = async (
+    formData
+  ) => {
     try {
       const responsePromise = axios.post(
         "/api/users/reset-password/generate-token",
-        { email: data.email }
+        { email: formData.email }
       );
 
       toast.promise(responsePromise, {
         loading: "processing...",
         success: (response) => {
-          setData(defaultData);
+          reset(defaultData);
           return response.data.message;
         },
         error: (error) => error.response.data.error,
@@ -46,14 +53,16 @@ const GenerateToken = () => {
             </h1>
             <form
               className="space-y-4 md:space-y-6"
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={handleSubmit(handleFormSubmit)}
             >
               <div className="relative pb-4">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.email?.message}
+                </span>
                 <input
                   type="email"
-                  name="email"
-                  value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                  id="email"
+                  {...register("email")}
                   className="bg-gray-50 border mb-4 border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Enter your email..."
                   required

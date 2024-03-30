@@ -1,35 +1,34 @@
 "use client";
+import {
+  ResetPasswordType,
+  resetPasswordSchema,
+} from "@/utils/schemas/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 
 const defaultData = { newPassword: "", confirmPassword: "" };
 
 const ResetPassword = () => {
-  const [data, setData] = useState(defaultData);
   const router = useRouter();
 
-  const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<ResetPasswordType>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!data.newPassword || !data.confirmPassword) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
-    if (data.newPassword !== data.confirmPassword) {
-      toast.error("Passwords dont match");
-      return;
-    }
-
+  const handleFormSubmit: SubmitHandler<ResetPasswordType> = async (
+    formData
+  ) => {
     try {
       const responsePromise = axios.post("/api/users/reset-password", {
-        password: data.confirmPassword,
+        password: formData.confirmPassword,
       });
 
       toast.promise(responsePromise, {
@@ -43,7 +42,7 @@ const ResetPassword = () => {
     } catch (error: any) {
       console.log(error.response);
     } finally {
-      setData(defaultData);
+      reset(defaultData);
     }
   };
   return (
@@ -56,21 +55,22 @@ const ResetPassword = () => {
             </h1>
             <form
               className="space-y-4 md:space-y-6"
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={handleSubmit(handleFormSubmit)}
             >
-              <div>
+              <div className="relative">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.password?.message}
+                </span>
                 <label
-                  htmlFor="newPassword"
+                  htmlFor="password"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   New Password
                 </label>
                 <input
                   type="password"
-                  name="newPassword"
-                  id="newPassword"
-                  value={data.newPassword}
-                  onChange={onValueChange}
+                  id="password"
+                  {...register("password")}
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="••••••••"
                   required
@@ -78,7 +78,10 @@ const ResetPassword = () => {
                 />
               </div>
 
-              <div>
+              <div className="relative">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.confirmPassword?.message}
+                </span>
                 <label
                   htmlFor="confirmPassword"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -87,10 +90,8 @@ const ResetPassword = () => {
                 </label>
                 <input
                   type="password"
-                  name="confirmPassword"
                   id="confirmPassword"
-                  value={data.confirmPassword}
-                  onChange={onValueChange}
+                  {...register("confirmPassword")}
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
