@@ -2,30 +2,28 @@
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginType, loginSchema } from "@/utils/schemas/auth.schema";
 
 const defaultData = { username: "", password: "" };
 
 const LoginPage = () => {
-  const [data, setData] = useState(defaultData);
-
   const router = useRouter();
 
-  const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<LoginType>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!data.username || !data.password) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
+  const handleFormSubmit: SubmitHandler<LoginType> = async (formData) => {
     try {
-      const responsePromise = axios.post("/api/users/login", data);
+      const responsePromise = axios.post("/api/users/login", formData);
 
       toast.promise(
         responsePromise,
@@ -34,7 +32,7 @@ const LoginPage = () => {
           success: (response) => {
             localStorage.setItem("username", response.data.username);
             router.push("/");
-            setData(defaultData);
+            reset(defaultData);
             return response.data.message;
           },
           error: (error) => `Login failed: ${error.response.data.error}`,
@@ -55,9 +53,12 @@ const LoginPage = () => {
             </h1>
             <form
               className="space-y-4 md:space-y-6"
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={handleSubmit(handleFormSubmit)}
             >
-              <div>
+              <div className="relative pb-2">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.username?.message}
+                </span>
                 <label
                   htmlFor="username"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -66,10 +67,8 @@ const LoginPage = () => {
                 </label>
                 <input
                   type="text"
-                  name="username"
                   id="username"
-                  value={data.username}
-                  onChange={onValueChange}
+                  {...register("username")}
                   placeholder="Homelander"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
@@ -77,6 +76,9 @@ const LoginPage = () => {
                 />
               </div>
               <div className="relative pb-2">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.password?.message}
+                </span>
                 <label
                   htmlFor="password"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -85,10 +87,8 @@ const LoginPage = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
                   id="password"
-                  value={data.password}
-                  onChange={onValueChange}
+                  {...register("password")}
                   placeholder="••••••••"
                   className="bg-gray-50 mb-2 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required

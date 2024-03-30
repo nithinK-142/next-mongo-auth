@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const encryptedTokenId = encryptId(tokenId);
     const verificationLink = `${process.env.NEXTAUTH_MONGO_URL}/reset-password/verify-token?verifyToken=${token}&verifyTokenId=${tokenId}`;
 
-    console.log(verificationLink);
+    // console.log(verificationLink);
 
     const mailResponse = await sendMail(email, verificationLink);
 
