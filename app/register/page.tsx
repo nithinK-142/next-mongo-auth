@@ -2,35 +2,33 @@
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
+import { RegisterType, registerSchema } from "@/utils/schemas/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 const defaultData = { email: "", username: "", password: "" };
 
 const RegisterPage = () => {
-  const [data, setData] = useState(defaultData);
-
   const router = useRouter();
 
-  const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<RegisterType>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!data.username || !data.password || !data.email) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
+  const handleFormSubmit: SubmitHandler<RegisterType> = async (formData) => {
     try {
-      const responsePromise = axios.post("/api/users/register", data);
+      const responsePromise = axios.post("/api/users/register", formData);
 
       toast.promise(responsePromise, {
         loading: "processing...",
         success: (response) => {
-          setData(defaultData);
+          reset(defaultData);
           router.push("/login");
           return response.data.message;
         },
@@ -52,9 +50,12 @@ const RegisterPage = () => {
             </h1>
             <form
               className="space-y-4 md:space-y-6"
-              onSubmit={(e) => handleSubmit(e)}
+              onSubmit={handleSubmit(handleFormSubmit)}
             >
-              <div>
+              <div className="relative">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.email?.message}
+                </span>
                 <label
                   htmlFor="email"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -63,10 +64,8 @@ const RegisterPage = () => {
                 </label>
                 <input
                   type="email"
-                  name="email"
                   id="email"
-                  value={data.email}
-                  onChange={onValueChange}
+                  {...register("email")}
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@company.com"
                   required
@@ -74,7 +73,10 @@ const RegisterPage = () => {
                 />
               </div>
 
-              <div>
+              <div className="relative">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.username?.message}
+                </span>
                 <label
                   htmlFor="username"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -83,17 +85,18 @@ const RegisterPage = () => {
                 </label>
                 <input
                   type="text"
-                  name="username"
                   id="username"
-                  value={data.username}
-                  onChange={onValueChange}
+                  {...register("username")}
                   placeholder="Homelander"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
                   autoComplete="off"
                 />
               </div>
-              <div>
+              <div className="relative">
+                <span className="absolute right-0 pt-1 text-sm font-medium text-red-500">
+                  {errors.password?.message}
+                </span>
                 <label
                   htmlFor="password"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -102,10 +105,8 @@ const RegisterPage = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
                   id="password"
-                  value={data.password}
-                  onChange={onValueChange}
+                  {...register("password")}
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
