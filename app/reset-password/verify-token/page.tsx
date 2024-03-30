@@ -4,20 +4,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent } from "react";
 import toast from "react-hot-toast";
 import { Suspense } from "react";
+import { verifyTokenSchema } from "@/utils/schemas/token.schema";
+import { z } from "zod";
 
 const VerifyTokenClient = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
   const token = searchParams.get("verifyToken");
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token) router.push("/login");
     try {
+      const validatedToken = verifyTokenSchema.parse({ token });
       const responsePromise = axios.post(
         "/api/users/reset-password/verify-token",
-        { token }
+        { token: validatedToken.token }
       );
 
       toast.promise(responsePromise, {
@@ -30,7 +31,11 @@ const VerifyTokenClient = () => {
           `User verification failed: ${error.response.data.error}`,
       });
     } catch (error: any) {
-      console.log(error.response);
+      if (error instanceof z.ZodError) {
+        const firstIssue = error.issues[0];
+        toast.error(firstIssue.message);
+        router.push("/login");
+      } else console.log(error.response);
     }
   };
 
