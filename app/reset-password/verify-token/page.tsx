@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent } from "react";
 import toast from "react-hot-toast";
 import { Suspense } from "react";
-import { verifyTokenSchema } from "@/utils/schemas/token.schema";
+import { verifyTokenSchema } from "@/schemas/token.schema";
 import { z } from "zod";
 
 const VerifyTokenClient = () => {

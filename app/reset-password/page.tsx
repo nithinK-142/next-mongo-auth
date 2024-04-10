@@ -1,8 +1,5 @@
 "use client";
-import {
-  ResetPasswordType,
-  resetPasswordSchema,
-} from "@/utils/schemas/auth.schema";
+import { ResetPasswordType, resetPasswordSchema } from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";

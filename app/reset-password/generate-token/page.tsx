@@ -2,7 +2,7 @@
 import {
   ResetPasswordEmailType,
   resetPasswordEmailSchema,
-} from "@/utils/schemas/auth.schema";
+} from "@/schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import Link from "next/link";
