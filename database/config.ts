@@ -19,13 +19,3 @@ export const Connect = async (): Promise<void> => {
     process.exit(1);
   }
 };
-
-export const Disconnect = async (): Promise<void> => {
-  try {
-    console.log("Disconnecting from MongoDB...");
-    await mongoose.disconnect();
-    console.log("Disconnected from MongoDB.");
-  } catch (error: any) {
-    console.log("Error while disconnecting from the database", error.message);
-  }
-};

@@ -1,4 +1,3 @@
-import { Disconnect } from "@/database/config";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -22,9 +21,5 @@ export async function GET() {
       { error: "Internal server error" },
       { status: 500 }
     );
-  } finally {
-    setTimeout(async () => {
-      await Disconnect();
-    }, 300000);
   }
 }
