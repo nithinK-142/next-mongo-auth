@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import { SentMessageInfo } from "nodemailer";
 import User from "@/models/user";
 import ResetToken from "@/models/token";
-import { Connect } from "@/database/config";
+import dbConnect from "@/database/config";
 import { encryptId } from "@/utils/crypto";
 import { sendMail } from "@/utils/mailer";
 
-Connect();
+dbConnect();
+
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { Connect } from "@/database/config";
+import dbConnect from "@/database/config";
 import User from "@/models/user";
 import ResetToken from "@/models/token";
 import { decryptId } from "@/utils/crypto";
 import { cookies } from "next/headers";
 
-Connect();
+dbConnect();
+
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();

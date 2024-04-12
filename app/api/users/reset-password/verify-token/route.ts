@@ -1,9 +1,9 @@
 import ResetToken from "@/models/token";
 import User from "@/models/user";
-import { Connect } from "@/database/config";
+import dbConnect from "@/database/config";
 import { NextRequest, NextResponse } from "next/server";
 
-Connect();
+dbConnect();
 
 export const POST = async (req: NextRequest) => {
   try {

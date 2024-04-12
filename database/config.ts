@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const Connect = async (): Promise<void> => {
+const dbConnect = async (): Promise<void> => {
   try {
     const mongodbUri = process.env.MONGODB_URI;
     if (!mongodbUri) throw new Error("MONGODB_URI is not defined");
@@ -19,3 +19,5 @@ export const Connect = async (): Promise<void> => {
     process.exit(1);
   }
 };
+
+export default dbConnect;

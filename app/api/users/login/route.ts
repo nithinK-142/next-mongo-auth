@@ -1,10 +1,10 @@
-import { Connect } from "@/database/config";
+import dbConnect from "@/database/config";
 import User from "@/models/user";
 import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-Connect();
+dbConnect();
 
 export const POST = async (req: NextRequest) => {
   try {
